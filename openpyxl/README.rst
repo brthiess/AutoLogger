@@ -1,0 +1,1 @@
+openpyxl has moved: please update your repositories to https://bitbucket.org/openpyxl/openpyxl !
