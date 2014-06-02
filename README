@@ -1,0 +1,123 @@
+How to run:
+	Type:
+		$ python main.py /address/to/file.xls
+		
+
+
+What I want this program to be able to do:
+
+	1. Automatically log all of the following:
+		a. My games from WCT website
+		b. Weekly technical and tactical practices
+		c. Weekly superleague games
+		d. Workouts
+		e. Mental Sessions 
+		f. Team Meetings
+
+	2. Give appropriate ratings to all of these tasks
+
+	3. Give appropriate description/comments to all of these tasks
+
+How will I accomplish this?
+
+	1. Be able to get WCT games
+		a. Get html from WCT website
+		b. Navigate site appropriately (automatically of course)
+		c. Interpret information correctly
+		d. Store information correctly
+		
+	2. Be able to extract the date and day from cells .xls file
+		a. Search for cells through worksheet that contain a date
+		b. Get the day from the specific date
+	
+	3. Have ratings that make sense for each game
+		a. Create ratings for each game (randomly)
+		b. Numbers should not be ridiculous.  (ex. Can't have Technical = 5.0 and Mental = 1.0)
+		
+	4. Have new and unique comments for every entry
+		a. Create a list for every type of activity (i.e. tactical practices, technical practices, games, workouts, mental training sessions)
+		b. Create sublists for each activity (i.e. good comments, neutral comments, bad comments, constructive comments)
+		c. Combine comments combinatorialy to (artificially) increase total number of unique comments? 
+			(ex: {"I played great", "I was throwing well"} --> {"I played great", "I was throwing well", "I played great. I was throwing well"}  )
+		d. Make sure comments make sense compared to rating
+		
+
+Proposed Program Structure:
+
+	main.py
+		-Runs the program.  Calls all appropriate functions to run program but otherwise does not do much else
+	
+	wctCrawler.py
+		-Deals with all things in getting games from WCT website
+		
+		Functions:
+			-getGames(string playerName) -Returns list of all games played
+			
+	calendarInterpreter.py
+		-Interprets date strings
+		
+		Functions:
+			-getDayFromDate(String date)  -Returns the day in int (1 = Sunday, 2 = Monday, ... etc.)
+		
+	ratings.py
+		-Generates ratings
+		
+		getActivityRating() -Returns a random float from 0 to 5.  (With bias towards 5)
+		getGameRating() - Returns 5 random floats from 0 to 5 for game ratings (ex: it returns 3.5, 4.5, 4.0, 3.5, 4.0)  (Has bias towards 5 and ratings will also be similar to each other)
+	
+	commentGenerator.py
+		-Generates comment based on type of activity and rating
+		
+		Functions:
+			-getComment(Activity a, float ratingsAverage) -Returns a comment in string format  (Need to check that comment has not been used before somehow..)
+			
+	activity.py
+		Activity Object
+		
+		variables:
+			-type (ex: 1 = Technical Practice, 2 = Tactical, ... etc.)
+			-date
+			-location
+			-venue
+			-duration
+			-supervision
+			-teamates
+			-quality
+			-comment
+		
+	game.py
+		-Game object. 
+		
+		Variables:
+			-location
+			-event
+			-opponent
+			-supervision
+			-technicalRating
+			-tacticalRating
+			-physicalRating
+			-mentalRating
+			-overallRating
+			-comment
+	
+	worksheetAnalyzer.py
+		-Contains functions to analyze various things within a worksheet
+		
+		Functions:
+			-hasCommentBeenUsedWithinLastXDays(int days) -Returns true or false depending on if the comment has been used within the last X days
+			
+			
+			
+	worksheetEditor.py
+		-Contains all necessary functions to edit worksheet and input games and activities
+		
+		Functions:
+			-insertGame(Game g)
+			-insertGames(List<Game> games)
+			-insertActivity(Activity a)
+			-insertActivities(List<Activity> activities)
+			
+	dataAnalyzer.py
+		-Collects all the necessary information and organizes it 
+		
+	
