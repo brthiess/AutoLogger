@@ -51,7 +51,14 @@ Proposed Program Structure:
 		-Deals with all things in getting games from WCT website
 		
 		Functions:
-			-getGames(string playerName) -Returns list of all games played
+			-getGames() -Creates (or updates) a file holding the information for all games played on the WCT 
+			
+	gameReader.py
+		-Deals with all things of reading games compiled by WCTCrawler and 
+		getting it in a readable format for other functions
+		
+			Functions:
+				-getGames(string playerName) -Returns a list of all games played by this player on the WCT
 			
 	calendarInterpreter.py
 		-Interprets date strings
@@ -92,6 +99,7 @@ Proposed Program Structure:
 			-location
 			-event
 			-opponent
+			-score			
 			-supervision
 			-technicalRating
 			-tacticalRating
@@ -99,6 +107,22 @@ Proposed Program Structure:
 			-mentalRating
 			-overallRating
 			-comment
+			
+	score.py
+		-Score object
+		
+		Variables
+			-ourScore
+			-theirScore
+			-ourScores
+			-theirScores
+			-totalEnds
+			
+		
+		Functions
+			-getOurScoreInEnd(int end)
+			-getTheirScoreInEnd(int end)
+			
 	
 	worksheetAnalyzer.py
 		-Contains functions to analyze various things within a worksheet

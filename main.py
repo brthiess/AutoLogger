@@ -41,11 +41,13 @@ def getFileName():
 		except (IOError):
 			raw_input("Could Not Open File.  Press Enter To Continue");
 
+#Quits the program
 def quitProgram():
 	os.system('clear')
 	print("Goodbye!")
 	sys.exit()
 
+#Returns a list of all the xls files in the directory this script is being run
 def getXLSFiles():
 	
 	allFiles = listdir(os.path.dirname(os.path.abspath(__file__)))
@@ -54,9 +56,10 @@ def getXLSFiles():
 		if ("xls" in allFiles[xls]): 
 			xlsFiles.append(allFiles[xls])
 	return xlsFiles
-	
-def auto_log(wb):
-	worksheetAnalyzer.analyzeWorksheet(wb)
+
+#Calls the worksheet analyzer to fill in the information for the wb	
+def auto_log(wb, playerName):
+	worksheetAnalyzer.analyzeWorksheet(wb, playerName)
 
 os.system('clear')
 
@@ -91,7 +94,7 @@ while(True):
 				print("Error Loading File")
 	elif(navigation == AUTO_LOG):
 		print("Auto_logging " + fileName + "...")
-		auto_log(wb)
+		auto_log(wb, name)
 		navigation += 1	
 	elif(navigation == QUIT):
 		quitProgram()
