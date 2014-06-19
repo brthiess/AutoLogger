@@ -60,11 +60,12 @@ Proposed Program Structure:
 			Functions:
 				-getGames(string playerName) -Returns a list of all games played by this player on the WCT
 			
-	calendarInterpreter.py
+	calendar.py
 		-Interprets date strings
 		
 		Functions:
-			-getDayFromDate(String date)  -Returns the day in int (1 = Sunday, 2 = Monday, ... etc.)
+			-getDayFromDate(date)  	-Returns the day in int (1 = Sunday, 2 = Monday, ... etc.)
+			-getDateFromOneYearAgo 			-Returns the date from one year ago
 		
 	ratings.py
 		-Generates ratings
@@ -77,6 +78,12 @@ Proposed Program Structure:
 		
 		Functions:
 			-getComment(Activity a, float ratingsAverage) -Returns a comment in string format  (Need to check that comment has not been used before somehow..)
+			
+	quality.py
+		-Generates Quality ratings (i.e. Numbers from 0 to 5)
+		
+		Functions
+			-randomQuality() Returns a quality from 0 to 5, with a bias towards 5
 			
 	activity.py
 		Activity Object
