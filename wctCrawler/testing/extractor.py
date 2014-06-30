@@ -45,6 +45,7 @@ def extractInformation(html):
 	year = None
 	date = None
 	event = None
+	linescore = None
 	
 	
 	upper_team_has_hammer = False
@@ -83,8 +84,9 @@ def extractInformation(html):
 			#If this is the top linescore, and they have hammer, then note it (used later)
 			if (team_number == 1 and hammer == True):
 				upper_team_has_hammer = True
-			#Create an empty linescore to be filled
-			linescore = [[]*8 for x in xrange(8)]
+			#Create an empty linescore to be filled if it hasn't been created yet
+			if (linescore is None):
+				linescore = getEmptyLinescore()
 			print("Length of Linescore: " + str(len(linescore)))
 			end_number = 0
 			#Go through the linescore and check for scores
@@ -92,10 +94,11 @@ def extractInformation(html):
 				#Check if it is an actual score and not some other random html
 				if(len(l) == 1 and (l == 'X' or (int(l) >= 0 and int(l) <= 8))):
 					if (hammer == True):
-						print("Hammer End Number: " + str(end_number))
+						print("Hammer End Number: " + str(end_number) + "  Score: " + l)
 						linescore[HAMMERTEAM].append(l) 
+						print(linescore[HAMMERTEAM])
 					elif(hammer == False):
-						print("Other End Number: " + str(end_number))
+						print("Other End Number: " + str(end_number) + "  Score: " + l)
 						linescore[OTHERTEAM].append(l)
 					end_number += 1
 						
@@ -113,9 +116,16 @@ def extractInformation(html):
 			assert (date is not None)
 			assert (event is not None)
 			games.append(game.Game(date, linescore, hammer_team, other_team, event))
+			print(games[len(games)-1].linescore)
+			
+			#Reset Everything
 			hammer = False
 			team_number = 0
 			upper_team_has_hammer = False
+			player_position_iterator = 0
+			hammer_team = team.Team()
+			other_team = team.Team()
+			linescore = None
 			
 			
 
@@ -220,6 +230,12 @@ def getDate(html_line, year):
 def getEvent(html_line):
 	event = html_line.replace('<meta property="og:title" content="', "").replace('"/>', "")
 	return event
+	
+def getEmptyLinescore():
+	linescore = []
+	linescore.append([])
+	linescore.append([])
+	return linescore
 	
 			
 if __name__ == '__main__':
