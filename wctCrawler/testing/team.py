@@ -28,9 +28,9 @@ class Team:
 		elif(position % 4 == Team.SECOND):
 			self.second = name
 		elif(position % 4 == Team.THIRD):
-			self.third == name
+			self.third = name
 		elif(position % 4 == Team.SKIP):
-			self.skip == name
+			self.skip = name
 		self.player_count += 1
 		
 	
