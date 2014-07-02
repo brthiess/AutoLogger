@@ -21,7 +21,7 @@ def getGames():
 		html = retriever.getHTML(url)
 		print(url)
 		#Get the game data and add it to previous game data
-		#gameData.extend(extractor.extractInformation(html))
+		gameData.extend(extractor.extractInformation(html))
 		#Get URL for next page
 		url = navigator.getNextPage(html)
 		

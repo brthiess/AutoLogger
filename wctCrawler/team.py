@@ -8,6 +8,11 @@ class Team:
 	
 	
 	def __init__(self, lead = None, second = None, third = None, skip = None):
+		self.playerList = []
+		self.playerList.append(lead)
+		self.playerList.append(second)
+		self.playerList.append(third)
+		self.playerList.append(skip)
 		self.lead = lead
 		self.second = second
 		self.third = third
@@ -21,16 +26,30 @@ class Team:
 			self.player_count += 1
 		if(skip is not None):
 			self.player_count += 1
-	
+			
+	def playerIsNotOnTeamAlready(self, name):
+		for p in self.playerList:
+			if (name == p):
+				return False
+		return True
+			
 	def addPlayer(self, position, name):
-		if (position % 4 == LEAD):
+		
+		if(Team.playerIsNotOnTeamAlready(self, name)):
+			self.player_count += 1
+		self.playerList.append(name)
+			
+		if (position % 4 == Team.LEAD):
 			self.lead = name
-		elif(position % 4 == SECOND):
+		elif(position % 4 == Team.SECOND):
 			self.second = name
-		elif(position % 4 == THIRD):
-			self.third == name
-		elif(position % 4 == SKIP):
-			self.skip == name
-		self.player_count += 1
+		elif(position % 4 == Team.THIRD):
+			self.third = name
+		elif(position % 4 == Team.SKIP):
+			self.skip = name
+		
+		
+	
+	
 		
 	

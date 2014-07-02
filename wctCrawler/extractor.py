@@ -3,15 +3,22 @@
 #Returns a list of games from that page
 
 import datetime
+import team
+import game
 
 LINESCORE = 'linescoreend'
 HAMMERIMG = 'http://www.curlingzone.com/forums/images/hammer.gif'
-HAMMER = 'linescorehamer'
+HAMMER = 'linescorehammer'
 ENDOFLINESCORE = '</table><br><br>'
 PLAYER = 'playerid'
 EVENT = 'meta property="og:title" content='
 DATE = 'linescoredrawhead'
 YEAR = 'Dates:'
+
+GRAND_SLAM_PLAYER = "<td class='stats_fourthrow'>"
+UPPER_SLAM_TABLE = "<table width='100%' cellpadding='0' cellspacing='0' border='1'><tr>"
+SLAM_TABLE = "<td colspan=2 width='-205' class=stats_headrow><p style='margin-left: 5px'></td>"       
+END_OF_SLAM_LINESCORE = '<td colspan=2 align=right>'
 
 
 
@@ -30,24 +37,26 @@ BOTTOM_LEAD = 8
 HAMMERTEAM = 0
 OTHERTEAM = 1
 
-UKNOWN = 0
+UNKNOWN = 0
+
 
 
 
 def extractInformation(html):
 	games = []
 	hammer = False
-	player_iterator = UNKNOWN
+	player_position_iterator = UNKNOWN
 	team_number = UNKNOWN
 	year = None
 	date = None
 	event = None
+	linescore = None
 	
 	
 	upper_team_has_hammer = False
 	
-	hammer_team = Team()
-	other_team = Team()
+	hammer_team = team.Team()
+	other_team = team.Team()
 	for h in range(0, len(html)):
 		#Get the date of the game
 		#Need to get year first
@@ -63,51 +72,57 @@ def extractInformation(html):
 			event = getEvent(html[h])
 		#Check if the team has hammer
 		elif (HAMMER in html[h] and HAMMERIMG in html[h]):
+			print("Found Hammer")
 			hammer = True
 		elif(HAMMER in html[h] and HAMMERIMG not in html[h]):
+			print("Found Not Hammer")
 			hammer = False
 		#Go through HTML and check for a linescore line
-		elif(LINESCORE in html[h]):				
-			#Found a linescore line.  Split up the line so that the numbers are separated
-			linescores = html[h].split("&nbsp;")	
+		elif(LINESCORE in html[h]):		
+			linescore, upper_team_has_hammer, team_number = addLinescore(html[h], linescore, team_number, hammer, upper_team_has_hammer)
 			
-			#Increment the team number.  Used to keep track of 
-			#whether this linescore is the top or bottom one
-			team_number += 1
-			
-			#If this is the top linescore, and they have hammer, then note it (used later)
-			if (team_number == 1 and hammer == True):
-				upper_team_has_hammer = True
-			#Create an empty linescore to be filled
-			linescore = [[]*8 for x in xrange(8)]
-			end_number = 0
-			#Go through the linescore and check for scores
-			for l in linescores:
-				#Check if it is an actual score and not some other random html
-				if(len(l) == 1 and ((int(l) >= 0 and int(l) <= 8) or l == 'X')):
-					if (hammer == True):
-						linescore[HAMMERTEAM][end_number] = l
-					elif(hammer == False):
-						linescore[OTHERTEAM][end_number] = l
-					end_number += 1
-						
 		#If a player line was found			
 		elif(PLAYER in html[h]):
 			#Increment this each time a new player is found
 			player_position_iterator += 1
 			#Update both teams
 			hammer_team, other_team = addPlayer(html, h, player_position_iterator, upper_team_has_hammer, hammer_team, other_team)
-				
+		
+		#Different HTML for adding players if it is a grand slam event...
+		elif(GRAND_SLAM_PLAYER in html[h]):
+			hammer_team, other_team = addSlamPlayer(html, h, upper_team_has_hammer, hammer_team, other_team)
 		#Found end of linescore.  Create a game out of it			
-		elif(ENDOFLINESCORE in h):
+		elif(ENDOFLINESCORE in html[h] or END_OF_SLAM_LINESCORE in html[h]):
 			assert (hammer_team.player_count == 4)
 			assert (other_team.player_count == 4)
 			assert (date is not None)
 			assert (event is not None)
-			games.append(Game(date, linescore, hammer_team, other_team, event))
+			games.append(game.Game(date, linescore, hammer_team, other_team, event))
+			
+			print(games[len(games)-1].otherTeam.lead)
+			print(games[len(games)-1].otherTeam.second)
+			print(games[len(games)-1].otherTeam.third)
+			print(games[len(games)-1].otherTeam.skip)
+			print(games[len(games)-1].hammerTeam.lead)
+			print(games[len(games)-1].hammerTeam.second)
+			print(games[len(games)-1].hammerTeam.third)
+			print(games[len(games)-1].hammerTeam.skip)
+			print(games[len(games)-1].date)
+			print(games[len(games)-1].event)
+			print(games[len(games)-1].linescore)
+
+			
+			#Reset Everything
 			hammer = False
 			team_number = 0
 			upper_team_has_hammer = False
+			player_position_iterator = 0
+			hammer_team = team.Team()
+			other_team = team.Team()
+			linescore = None
+			
+	
+	return games
 			
 			
 
@@ -115,13 +130,15 @@ def addPlayer(html, h, position, upper_team_has_hammer, hammer_team, other_team)
 			assert (position >= UPPER_SKIP and position <= BOTTOM_LEAD)
 			#Extract the player name from HTML
 			#Gets rid of useless html stuff
-			player_name = html[h+2].replace("<td><b>", " ").replace("<br>", " ").replace("</b></td>", " ").split()
-			
+			player_name = html[h+3].replace("<td><b>", " ").replace("<br>", " ").replace("</b></td>", " ").split()
+			print("Player name" + player_name[0] + str(position))
 			#Series of if statements to add player to team
 			if (upper_team_has_hammer):
 				if (position == UPPER_SKIP):
 					hammer_team.addPlayer(UPPER_SKIP, player_name)
+					print("Found skip")
 				elif(position == UPPER_THIRD):
+					print("Found third")
 					hammer_team.addPlayer(UPPER_THIRD, player_name)
 				elif(position == UPPER_SECOND):
 					hammer_team.addPlayer(UPPER_SECOND, player_name)
@@ -213,5 +230,121 @@ def getEvent(html_line):
 	event = html_line.replace('<meta property="og:title" content="', "").replace('"/>', "")
 	return event
 	
+def getEmptyLinescore():
+	linescore = []
+	linescore.append([])
+	linescore.append([])
+	return linescore
+	
+#Found a linescore line.  Split up the line so that the numbers are separated
+def addLinescore(html, linescore, team_number, hammer, upper_team_has_hammer):
+	linescores = html.split("&nbsp;")	
+	
+	#Increment the team number.  Used to keep track of 
+	#whether this linescore is the top or bottom one
+	team_number += 1
+	
+	#If this is the top linescore, and they have hammer, then note it (used later)
+	if (team_number == 1 and hammer == True):
+		upper_team_has_hammer = True
+	#Create an empty linescore to be filled if it hasn't been created yet
+	if (linescore is None):
+		linescore = getEmptyLinescore()
+	print("Length of Linescore: " + str(len(linescore)))
+	end_number = 0
+	#Go through the linescore and check for scores
+	for l in linescores:
+		#Check if it is an actual score and not some other random html
+		if(len(l) == 1 and (l == 'X' or (int(l) >= 0 and int(l) <= 8))):
+			if (hammer == True):
+				print("Hammer End Number: " + str(end_number) + "  Score: " + l)
+				linescore[HAMMERTEAM].append(l) 
+				print(linescore[HAMMERTEAM])
+			elif(hammer == False):
+				print("Other End Number: " + str(end_number) + "  Score: " + l)
+				linescore[OTHERTEAM].append(l)
+			end_number += 1
+	return linescore, upper_team_has_hammer, team_number
+				
 			
-					
+def addSlamPlayer(html, h, upper_team_has_hammer, hammer_team, other_team):	
+		#Check if this is the upper team or the lower team
+		#in the table
+		#Then find the position of the player
+		if (inUpperSlamTable(html, h)):
+			if ('4:' in html[h-1]):
+				position = UPPER_SKIP
+			elif('3:' in html[h-1]):
+				position = UPPER_THIRD
+			elif('2:' in html[h-1]):
+				position = UPPER_SECOND
+			elif('1:' in html[h-1]):
+				position = UPPER_LEAD
+		else:
+			if ('4:' in html[h-1]):
+				position = BOTTOM_SKIP
+			elif('3:' in html[h-1]):
+				position = BOTTOM_THIRD
+			elif('2:' in html[h-1]):
+				position = BOTTOM_SECOND
+			elif('1:' in html[h-1]):
+				position = BOTTOM_LEAD
+		assert (position >= UPPER_SKIP and position <= BOTTOM_LEAD)
+		#Extract the player name from HTML
+		#Gets rid of useless html stuff
+		player_name = html[h].replace("<td class='stats_fourthrow'>&nbsp;", " ").replace("<br></td>", " ").split()
+		print("Player name" + player_name[0] + str(position))
+		#Series of if statements to add player to team
+		if (upper_team_has_hammer):
+			if (position == UPPER_SKIP):
+				hammer_team.addPlayer(UPPER_SKIP, player_name)
+				print("Found skip")
+			elif(position == UPPER_THIRD):
+				print("Found third")
+				hammer_team.addPlayer(UPPER_THIRD, player_name)
+			elif(position == UPPER_SECOND):
+				hammer_team.addPlayer(UPPER_SECOND, player_name)
+			elif(position == UPPER_LEAD):
+				hammer_team.addPlayer(UPPER_LEAD, player_name)
+			elif(position == BOTTOM_SKIP):
+				other_team.addPlayer(BOTTOM_SKIP, player_name)
+			elif(position == BOTTOM_THIRD):
+				other_team.addPlayer(BOTTOM_THIRD, player_name)
+			elif(position == BOTTOM_SECOND):
+				other_team.addPlayer(BOTTOM_SECOND, player_name)
+			elif(position == BOTTOM_LEAD):
+				other_team.addPlayer(BOTTOM_LEAD, player_name)
+		else:
+			if (position == UPPER_SKIP):
+				other_team.addPlayer(UPPER_SKIP, player_name)
+			elif(position == UPPER_THIRD):
+				other_team.addPlayer(UPPER_THIRD, player_name)
+			elif(position == UPPER_SECOND):
+				other_team.addPlayer(UPPER_SECOND, player_name)
+			elif(position == UPPER_LEAD):
+				other_team.addPlayer(UPPER_LEAD, player_name)
+			elif(position == BOTTOM_SKIP):
+				hammer_team.addPlayer(BOTTOM_SKIP, player_name)
+			elif(position == BOTTOM_THIRD):
+				hammer_team.addPlayer(BOTTOM_THIRD, player_name)
+			elif(position == BOTTOM_SECOND):
+				hammer_team.addPlayer(BOTTOM_SECOND, player_name)
+			elif(position == BOTTOM_LEAD):
+				hammer_team.addPlayer(BOTTOM_LEAD, player_name)
+				
+		return hammer_team, other_team
+		
+def inUpperSlamTable(html, h):
+	number_of_tables_encountered = 0
+	for i in range(h, 0, -1):
+		if (SLAM_TABLE in html[i]):
+			number_of_tables_encountered += 1
+		if (UPPER_SLAM_TABLE in html[i]):
+			if (number_of_tables_encountered == 2):
+				return False
+			elif(number_of_tables_encountered == 1):
+				return True
+	#Should not reach here	
+	print(number_of_tables_encountered)
+	assert(False)
+

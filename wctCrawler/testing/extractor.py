@@ -15,6 +15,11 @@ EVENT = 'meta property="og:title" content='
 DATE = 'linescoredrawhead'
 YEAR = 'Dates:'
 
+GRAND_SLAM_PLAYER = "<td class='stats_fourthrow'>"
+UPPER_SLAM_TABLE = "<table width='100%' cellpadding='0' cellspacing='0' border='1'><tr>"
+SLAM_TABLE = "<td colspan=2 width='-205' class=stats_headrow><p style='margin-left: 5px'></td>"       
+END_OF_SLAM_LINESCORE = '<td colspan=2 align=right>'
+
 
 
 UPPER_TEAM = 1
@@ -74,7 +79,7 @@ def extractInformation(html):
 			hammer = False
 		#Go through HTML and check for a linescore line
 		elif(LINESCORE in html[h]):		
-			linescore, upper_team_has_hammer, team_number = addLinescore(html[h], linescore, team_number, hammer)
+			linescore, upper_team_has_hammer, team_number = addLinescore(html[h], linescore, team_number, hammer, upper_team_has_hammer)
 			
 		#If a player line was found			
 		elif(PLAYER in html[h]):
@@ -83,11 +88,11 @@ def extractInformation(html):
 			#Update both teams
 			hammer_team, other_team = addPlayer(html, h, player_position_iterator, upper_team_has_hammer, hammer_team, other_team)
 		
-		#Different HTML for grand slam events...
-		#elif(GRAND_SLAM_PLAYER in html[h]):
-			
+		#Different HTML for adding players if it is a grand slam event...
+		elif(GRAND_SLAM_PLAYER in html[h]):
+			hammer_team, other_team = addSlamPlayer(html, h, upper_team_has_hammer, hammer_team, other_team)
 		#Found end of linescore.  Create a game out of it			
-		elif(ENDOFLINESCORE in html[h]):
+		elif(ENDOFLINESCORE in html[h] or END_OF_SLAM_LINESCORE in html[h]):
 			assert (hammer_team.player_count == 4)
 			assert (other_team.player_count == 4)
 			assert (date is not None)
@@ -115,6 +120,9 @@ def extractInformation(html):
 			hammer_team = team.Team()
 			other_team = team.Team()
 			linescore = None
+			
+	
+	return games
 			
 			
 
@@ -229,7 +237,7 @@ def getEmptyLinescore():
 	return linescore
 	
 #Found a linescore line.  Split up the line so that the numbers are separated
-def addLinescore(html, linescore, team_number, hammer):
+def addLinescore(html, linescore, team_number, hammer, upper_team_has_hammer):
 	linescores = html.split("&nbsp;")	
 	
 	#Increment the team number.  Used to keep track of 
@@ -259,9 +267,90 @@ def addLinescore(html, linescore, team_number, hammer):
 	return linescore, upper_team_has_hammer, team_number
 				
 			
+def addSlamPlayer(html, h, upper_team_has_hammer, hammer_team, other_team):	
+		#Check if this is the upper team or the lower team
+		#in the table
+		#Then find the position of the player
+		if (inUpperSlamTable(html, h)):
+			if ('4:' in html[h-1]):
+				position = UPPER_SKIP
+			elif('3:' in html[h-1]):
+				position = UPPER_THIRD
+			elif('2:' in html[h-1]):
+				position = UPPER_SECOND
+			elif('1:' in html[h-1]):
+				position = UPPER_LEAD
+		else:
+			if ('4:' in html[h-1]):
+				position = BOTTOM_SKIP
+			elif('3:' in html[h-1]):
+				position = BOTTOM_THIRD
+			elif('2:' in html[h-1]):
+				position = BOTTOM_SECOND
+			elif('1:' in html[h-1]):
+				position = BOTTOM_LEAD
+		assert (position >= UPPER_SKIP and position <= BOTTOM_LEAD)
+		#Extract the player name from HTML
+		#Gets rid of useless html stuff
+		player_name = html[h].replace("<td class='stats_fourthrow'>&nbsp;", " ").replace("<br></td>", " ").split()
+		print("Player name" + player_name[0] + str(position))
+		#Series of if statements to add player to team
+		if (upper_team_has_hammer):
+			if (position == UPPER_SKIP):
+				hammer_team.addPlayer(UPPER_SKIP, player_name)
+				print("Found skip")
+			elif(position == UPPER_THIRD):
+				print("Found third")
+				hammer_team.addPlayer(UPPER_THIRD, player_name)
+			elif(position == UPPER_SECOND):
+				hammer_team.addPlayer(UPPER_SECOND, player_name)
+			elif(position == UPPER_LEAD):
+				hammer_team.addPlayer(UPPER_LEAD, player_name)
+			elif(position == BOTTOM_SKIP):
+				other_team.addPlayer(BOTTOM_SKIP, player_name)
+			elif(position == BOTTOM_THIRD):
+				other_team.addPlayer(BOTTOM_THIRD, player_name)
+			elif(position == BOTTOM_SECOND):
+				other_team.addPlayer(BOTTOM_SECOND, player_name)
+			elif(position == BOTTOM_LEAD):
+				other_team.addPlayer(BOTTOM_LEAD, player_name)
+		else:
+			if (position == UPPER_SKIP):
+				other_team.addPlayer(UPPER_SKIP, player_name)
+			elif(position == UPPER_THIRD):
+				other_team.addPlayer(UPPER_THIRD, player_name)
+			elif(position == UPPER_SECOND):
+				other_team.addPlayer(UPPER_SECOND, player_name)
+			elif(position == UPPER_LEAD):
+				other_team.addPlayer(UPPER_LEAD, player_name)
+			elif(position == BOTTOM_SKIP):
+				hammer_team.addPlayer(BOTTOM_SKIP, player_name)
+			elif(position == BOTTOM_THIRD):
+				hammer_team.addPlayer(BOTTOM_THIRD, player_name)
+			elif(position == BOTTOM_SECOND):
+				hammer_team.addPlayer(BOTTOM_SECOND, player_name)
+			elif(position == BOTTOM_LEAD):
+				hammer_team.addPlayer(BOTTOM_LEAD, player_name)
+				
+		return hammer_team, other_team
+		
+def inUpperSlamTable(html, h):
+	number_of_tables_encountered = 0
+	for i in range(h, 0, -1):
+		if (SLAM_TABLE in html[i]):
+			number_of_tables_encountered += 1
+		if (UPPER_SLAM_TABLE in html[i]):
+			if (number_of_tables_encountered == 2):
+				return False
+			elif(number_of_tables_encountered == 1):
+				return True
+	#Should not reach here	
+	print(number_of_tables_encountered)
+	assert(False)
+		
 if __name__ == '__main__':
-	f = open('events4.html')
+	f = open('events1.html')
 	html = f.readlines()
 	f.close()	
-	extractInformation(html)	
+	games = extractInformation(html)	
 
