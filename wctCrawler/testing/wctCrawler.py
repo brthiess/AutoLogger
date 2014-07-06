@@ -4,9 +4,6 @@ import extractor
 import time
 
 
-HAMMERTEAM = 0
-OTHERTEAM = 1
-
 
 #Starting URL
 URL = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2013'
@@ -38,10 +35,8 @@ def getGames():
 		gameFile.write("_d\n")
 		gameFile.write(str(g.date) + '\n')
 		#Write the linescore
-		gameFile.write("_lh\n")
-		gameFile.write(str(g.linescore[HAMMERTEAM]) + '\n')
-		gameFile.write("_lo\n")
-		gameFile.write(str(g.linescore[OTHERTEAM]) + '\n')
+		gameFile.write("_l\n")
+		gameFile.write(str(g.linescore) + '\n')
 		#Write the team with the hammer
 		gameFile.write("_ht\n")
 		#Write in lead, second, third, skip
@@ -63,7 +58,6 @@ def getGames():
 		gameFile.write(str(g.otherTeam.third) + '\n')
 		gameFile.write("_of\n")
 		gameFile.write(str(g.otherTeam.skip) + '\n')
-		#Write in event
 		gameFile.write("_e\n")
 		gameFile.write(str(g.event) + '\n')
 		

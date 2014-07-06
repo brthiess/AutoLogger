@@ -59,7 +59,7 @@ def extractInformation(html):
 	other_team = team.Team()
 	for h in range(0, len(html)):
 		#Get the date of the game
-		#Need to get year first
+		#Need to get	 year first
 		if (YEAR in html[h]):
 			year = getYear(html[h+1])
 			assert(year is not None)
@@ -131,7 +131,7 @@ def addPlayer(html, h, position, upper_team_has_hammer, hammer_team, other_team)
 			#Extract the player name from HTML
 			#Gets rid of useless html stuff
 			player_name = html[h+3].replace("<td><b>", " ").replace("<br>", " ").replace("</b></td>", " ").split()
-			print("Player name" + player_name[0] + str(position))
+	
 			#Series of if statements to add player to team
 			if (upper_team_has_hammer):
 				if (position == UPPER_SKIP):
@@ -183,7 +183,7 @@ def getDate(html_line, year):
 	day = 0
 	#Check which month is indicated on the line
 	if ('Jan' in html_line):
-		#Somewhat obtuse line of code here...
+		#Somewhat obtuse lines of code here...
 		#Grabs the day number (1 - 31), from finding the index of substring of the month
 		day = html_line[html_line.index('Jan') + 4:-len(html_line) + html_line.index('Jan') + 4 + 2]
 		month = 1
@@ -220,6 +220,11 @@ def getDate(html_line, year):
 	elif ('Dec' in html_line):
 		day = html_line[html_line.index('Dec') + 4:-len(html_line) + html_line.index('Dec') + 4 + 2]
 		month = 12
+	#No date found
+	else:
+		day = 1
+		month = 1
+		year = 2000
 	
 	assert(int(day) >= 1 and int(day) <= 31)
 	

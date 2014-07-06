@@ -6,18 +6,10 @@ HTTPWORLDCURL = "http://www.worldcurl.com/"
 EVENTSURL = "http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2013"
 LINESCORE = "linescoredrawlink"
 DRAWLINK = "showdrawid"
-VIEWPREVIOUSSEASON = 'View Previous Season'
-
-MEN_2012 = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2012'
-MEN_2013 = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2013'
-MEN_2014 = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2014'
-WOMEN_2012 = 'http://www.worldcurl.com/schedule.php?eventtypeid=51&eventyear=2012'
-WOMEN_2013 = 'http://www.worldcurl.com/schedule.php?eventtypeid=51&eventyear=2013'
-WOMEN_2014 = 'http://www.worldcurl.com/schedule.php?eventtypeid=51&eventyear=2014'
 
 visitedUrls = []
 
-def getNextPage(html, web_url):
+def getNextPage(html):
 
 	#Go through the HTML line by line, check for relevant links
 	for line in html:
@@ -29,6 +21,8 @@ def getNextPage(html, web_url):
 			if (hasNotBeenVisitedYet(url[0])):
 				visitedUrls.append(url[0])
 				return HTTPWORLDCURL + url[0]
+			if (not hasNotBeenVisitedYet(url[0])):
+				return None
 		#Check for the scores link next
 		elif (SCORES in line):
 			url = line.split("href=")
@@ -43,9 +37,8 @@ def getNextPage(html, web_url):
 				if (DRAWLINK in u and hasNotBeenVisitedYet(u)):
 					visitedUrls.append(u)
 					return HTTPWORLDCURL + u
-					
 	#If nothing found, go back to beginning
-	return getCorrectSchedulePage(html, web_url)
+	return EVENTSURL
 					
 			
 			
@@ -56,25 +49,5 @@ def hasNotBeenVisitedYet(url):
 		return False
 	else:
 		return True
-		
-#Checks to see if every event for every year for both genders has been visited
-def getCorrectSchedulePage(html, web_url):
-		visitedUrls.append(web_url)
-		if (hasNotBeenVisitedYet(MEN_2012)):
-			return MEN_2012
-		elif(hasNotBeenVisitedYet(MEN_2013)):
-			return MEN_2013
-		elif(hasNotBeenVisitedYet(MEN_2014)):
-			return MEN_2014
-		elif(hasNotBeenVisitedYet(WOMEN_2012)):
-			return WOMEN_2012
-		elif(hasNotBeenVisitedYet(WOMEN_2013)):
-			return WOMEN_2013
-		elif(hasNotBeenVisitedYet(WOMEN_2014)):
-			return WOMEN_2014
-		else:
-			return None
-
-
-	
+			
 

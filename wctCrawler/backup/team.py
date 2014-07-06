@@ -35,7 +35,7 @@ class Team:
 			
 	def addPlayer(self, position, name):
 		
-		if(Team.playerIsNotOnTeamAlready(self, name) or Team.nameIsBlank(self, name)):
+		if(Team.playerIsNotOnTeamAlready(self, name)):
 			self.player_count += 1
 		self.playerList.append(name)
 			
@@ -47,12 +47,6 @@ class Team:
 			self.third = name
 		elif(position % 4 == Team.SKIP):
 			self.skip = name
-			
-	def nameIsBlank(self, name):
-		if (len(name) == 0):
-			return True
-		else:
-			return False
 		
 		
 	
