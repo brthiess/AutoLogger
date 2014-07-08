@@ -93,8 +93,6 @@ def extractInformation(html):
 			hammer_team, other_team = addSlamPlayer(html, h, upper_team_has_hammer, hammer_team, other_team)
 		#Found end of linescore.  Create a game out of it			
 		elif(ENDOFLINESCORE in html[h] or END_OF_SLAM_LINESCORE in html[h]):
-			assert (hammer_team.player_count == 4)
-			assert (other_team.player_count == 4)
 			assert (date is not None)
 			assert (event is not None)
 			games.append(game.Game(date, linescore, hammer_team, other_team, event))

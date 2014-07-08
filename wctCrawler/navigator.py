@@ -59,7 +59,13 @@ def hasNotBeenVisitedYet(url):
 		
 #Checks to see if every event for every year for both genders has been visited
 def getCorrectSchedulePage(html, web_url):
-		visitedUrls.append(web_url)
+		
+		#If we have hit the end of a schedules page
+		#Append that url to the list and find a new schedule page
+		#Else do not append the schedule url to the visited urls
+		for h in html:
+			if (VIEWPREVIOUSSEASON in h):	
+				visitedUrls.append(web_url)
 		if (hasNotBeenVisitedYet(MEN_2012)):
 			return MEN_2012
 		elif(hasNotBeenVisitedYet(MEN_2013)):

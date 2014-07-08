@@ -18,7 +18,7 @@ def getGames():
 	#Get initial HTML from the starting URL address
 	html = retriever.getHTML(URL)
 	#Get URL for next page
-	url = navigator.getNextPage(html)
+	url = navigator.getNextPage(html, URL)
 
 	while(url is not None):
 		time.sleep(1)
@@ -27,9 +27,13 @@ def getGames():
 		print("URL: " + url)
 		#Get the game data and add it to previous game data
 		gameData.extend(extractor.extractInformation(html))
+		#Add the games to the database
+		addGames(gameData)
 		#Get URL for next page
-		url = navigator.getNextPage(html)
+		url = navigator.getNextPage(html, url)
 		
+		
+def addGames(gameData):	
 	gameFile = open('games.dat', 'w')
 	
 	#Write all information to a file
@@ -66,6 +70,7 @@ def getGames():
 		#Write in event
 		gameFile.write("_e\n")
 		gameFile.write(str(g.event) + '\n')
+	gameFile.close()
 		
 		
 
