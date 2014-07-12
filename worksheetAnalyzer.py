@@ -8,4 +8,7 @@ def analyzeWorksheet(wb, playerName):
 	#Returns the list of practices, workouts, etc.
 	activities = activityCreator.getActivities(playerName)
 	
+	for a in activities:
+		a.to_string()
+	
 	

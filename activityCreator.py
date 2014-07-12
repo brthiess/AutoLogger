@@ -8,6 +8,8 @@ from constants import *
 
 
 
+
+
 #Get all of the activities for the player and return it as a list
 def getActivities(playerName, startDate = None, endDate = None):
 	#Check if these parameters were entered
@@ -40,10 +42,9 @@ def getTactical(playerName, startDate, endDate):
 		#then create a tactical activity and add it to the list
 		if (calendar.getDayFromDate(activityDate) == TUESDAY and (activityDate.month >= 9 or activityDate.month < 5 )):
 			#Get a quality rating
-			print activityDate
-			rating = quality.randomQuality()
+			rating = quality.randomQuality(RANDOM_RATING)
 			#Get a comment based off that quality rating
-			remark = comment.getComment(TACTICAL, quality)
+			remark = comment.getComment(TACTICAL, rating)
 			#Create the activity and append it to the list
 			tacticalActivity = Activity(TACTICAL, playerName, activityDate, SAVILLE, ICE, 
 			90, ROB, ALL, rating, remark)
@@ -51,6 +52,7 @@ def getTactical(playerName, startDate, endDate):
 		#Increment the date by one day
 		activityDate = calendar.incrementDate(activityDate)
 	return tacticalActivities
+	
 def getPhysical(playerName, startDate, endDate):
 	physicalActivities = []
 	activityDate = startDate
@@ -65,9 +67,9 @@ def getPhysical(playerName, startDate, endDate):
 		#or on the days we workout with a trainer
 		if (rand == 3 or calendar.getDayFromDate(activityDate) == THURSDAY):
 			#Get a quality rating
-			rating = quality.randomQuality()
+			rating = quality.randomQuality(RANDOM_RATING)
 			#Get a comment based off that quality rating
-			remark = comment.getComment(PHYSICAL, quality)
+			remark = comment.getComment(PHYSICAL, rating)
 			time = random.randrange(30,90,15)
 			#Create the activity and append it to the list
 			if (calendar.getDayFromDate(activityDate) == THURSDAY):
@@ -93,9 +95,9 @@ def getTechnical(playerName, startDate, endDate):
 		#If it is a Tuesday
 		if (calendar.getDayFromDate(activityDate) == TUESDAY and (activityDate.month >= 9 or activityDate.month < 5 )):
 			#Get a quality rating
-			rating = quality.randomQuality()
+			rating = quality.randomQuality(RANDOM_RATING)
 			#Get a comment based off that quality rating
-			remark = comment.getComment(TECHNICAL, quality)
+			remark = comment.getComment(TECHNICAL, rating)
 			#Create the activity and append it to the list
 			technicalActivity = Activity(TECHNICAL, playerName, activityDate, SAVILLE, ICE, 
 			60, ROB, ALL, rating, remark)
@@ -118,9 +120,9 @@ def getMental(playerName, startDate, endDate):
 		#or on the days we work with Kyle
 		if (rand == 10 or calendar.getDayFromDate(activityDate) == MONDAY):
 			#Get a quality rating
-			rating = quality.randomQuality()
+			rating = quality.randomQuality(RANDOM_RATING)
 			#Get a comment based off that quality rating
-			remark = comment.getComment(TECHNICAL, quality)
+			remark = comment.getComment(TECHNICAL, rating)
 			time = random.randrange(30,91,15)
 			#Create the activity and append it to the list
 			mentalActivity = Activity(MENTAL, playerName, activityDate, SAVILLE, ROOM, 

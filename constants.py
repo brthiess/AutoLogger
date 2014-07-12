@@ -22,3 +22,8 @@ HPTRC = "HPTRC"
 NO_MATES = "None"
 ROOM = "Back Office"
 
+#Rating:		2.0		2.5		3.0		3.5		4.0		4.5		5.0
+HIGH_RATING = (	0,		0, 		0, 		0.1,	0.3, 	0.4, 	0.2)
+LOW_RATING =  (	0.05,	0.1,	0.3,	0.4,	0.15, 	0.0, 	0.0)
+RANDOM_RATING=(	0.025,	0.05, 	0.1,	0.2,	0.4,	0.2,	0.025)
+
