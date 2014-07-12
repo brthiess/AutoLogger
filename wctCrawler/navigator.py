@@ -11,18 +11,22 @@ VIEWPREVIOUSSEASON = 'View Previous Season'
 MEN_2012 = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2012'
 MEN_2013 = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2013'
 MEN_2014 = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2014'
+MEN_2015 = 'http://www.worldcurl.com/schedule.php?eventtypeid=21'
 WOMEN_2012 = 'http://www.worldcurl.com/schedule.php?eventtypeid=51&eventyear=2012'
 WOMEN_2013 = 'http://www.worldcurl.com/schedule.php?eventtypeid=51&eventyear=2013'
 WOMEN_2014 = 'http://www.worldcurl.com/schedule.php?eventtypeid=51&eventyear=2014'
-
+WOMEN_2015 = 'http://www.worldcurl.com/schedule.php?eventtypeid=51'
 visitedUrls = []
 
-def getNextPage(html, web_url):
+#Figure out the next page to visit
+#latest_update_date: 	The latest date of the games recorded in the games.dat file.  Don't bother
+#					visiting events that have already been recorded in the file  
+def getNextPage(html, web_url, latest_update_date):
 
 	#Go through the HTML line by line, check for relevant links
 	for line in html:
-		#Check for events first
-		if (EVENT in line and EVENTLINK in line):
+		#Check for events first.  Check to make sure event is not older than the latest date (i.e. already in games.dat)
+		if (EVENT in line and EVENTLINK in line and eventIsNotOlderThanLatestDate(html, line, latest_update_date)):
 			#Grab the event URL
 			url = line.split("<A HREF=")
 			url = url[1].split(">")
@@ -44,7 +48,7 @@ def getNextPage(html, web_url):
 					visitedUrls.append(u)
 					return HTTPWORLDCURL + u
 					
-	#If nothing found, go back to beginning
+	#If nothing found, go back to beginning of page or new schedule page
 	return getCorrectSchedulePage(html, web_url)
 					
 			
@@ -80,6 +84,16 @@ def getCorrectSchedulePage(html, web_url):
 			return WOMEN_2014
 		else:
 			return None
+
+#Checks if the current event being looked at has a date that 
+#is older than the latest date in the games.dat file
+def eventIsNotOlderThanLatestDate(html, line, latest_update_date):
+	for h in range(0, len(html)):
+		if (line in html[h]):
+			event_date = getDate(html[h+4])
+			
+def getDate(html_line):
+	
 
 
 	
