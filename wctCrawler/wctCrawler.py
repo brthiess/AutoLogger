@@ -13,13 +13,13 @@ OTHERTEAM = 1
 URL = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2013'
 #Crawls the WCT website and extracts all available games
 #Stores the information in a local file
-def getGames(last_update_date):
+def getGames():
 	notAllGamesFound = True
 	gameData = []
 	#Get initial HTML from the starting URL address
 	html = retriever.getHTML(URL)
 	#Get URL for next page
-	url = navigator.getNextPage(html, URL, last_update_date)
+	url = navigator.getNextPage(html, URL)
 
 	while(url is not None):
 		#Delay for politeness
@@ -77,26 +77,10 @@ def addGames(gameData):
 		
 		
 def updateGames():
-	last_update_date = getLastUpdateDate()
 	getGames()
 	
 
-def getLastUpdateDate():
-		gameFile = open('games.dat', 'r')
-		
-	latestDate = datetime.date(2000,1,1)
-	for g in range(0, len(gameFile)):
-		if ('_d' in gameFile[g]):
-			date_on_line = str(gameFile[g+1])
-		try:
-			dt_start = datetime.strptime(i, '%Y, %m, %d')
-			if (date_on_line > latestDate):
-				latestDate = date_on_line
-		except ValueError:
-			print "Incorrect format"
-			
-			
-	return latestDate
+
 	
 
 getGames()
