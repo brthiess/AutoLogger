@@ -169,13 +169,17 @@ def addPlayer(html, h, position, upper_team_has_hammer, hammer_team, other_team)
 					hammer_team.addPlayer(BOTTOM_LEAD, player_name)
 					
 			return hammer_team, other_team
-			
+
+#Is given the line containing 'Dates: '			
 def getYear(html_line):
 	for year in range(2008, 2016):
 		if (str(year) in html_line):
 			return year
 	return None
-			
+
+
+#Is given the line containing 'linescoredrawhead'
+#And returns the date on that line
 def getDate(html_line, year):
 	month = 0
 	day = 0
@@ -225,6 +229,8 @@ def getDate(html_line, year):
 		year = 2000
 	
 	assert(int(day) >= 1 and int(day) <= 31)
+	assert(int(month) >= 1 and int(month) <= 12)
+	assert(int(year) >= 2000 and int(year) <= 2015)
 	
 	date = datetime.date(year, month, int(day))
 	return date

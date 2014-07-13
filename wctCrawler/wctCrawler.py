@@ -10,7 +10,8 @@ OTHERTEAM = 1
 
 
 #Starting URL
-URL = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2013'
+URL = 'http://www.worldcurl.com/schedule.php?eventtypeid=21&eventyear=2012'
+print("URL: " + URL)
 #Crawls the WCT website and extracts all available games
 #Stores the information in a local file
 def getGames():
@@ -18,8 +19,13 @@ def getGames():
 	gameData = []
 	#Get initial HTML from the starting URL address
 	html = retriever.getHTML(URL)
+
+		
+	starting_date = getStartingDate()
+	
 	#Get URL for next page
-	url = navigator.getNextPage(html, URL)
+	url = navigator.getNextPage(html, URL, starting_date)
+
 
 	while(url is not None):
 		#Delay for politeness
@@ -32,7 +38,7 @@ def getGames():
 		#Add the games to the database
 		addGames(gameData)
 		#Get URL for next page
-		url = navigator.getNextPage(html, url, last_update_date)
+		url = navigator.getNextPage(html, url, starting_date)
 		
 		
 def addGames(gameData):	
@@ -78,6 +84,35 @@ def addGames(gameData):
 		
 def updateGames():
 	getGames()
+	#TODO: Remove Duplicate games
+	#removeDuplicates()
+	
+
+#Gets the latest date of the games in the games.dat file
+def getStartingDate():
+	f = open('games.dat', 'r')	
+	#Put files into an array
+	gameFile = f.readlines()
+	#Close file
+	f.close()
+	#strip each entry in the array of the \n
+	gameFile = [x.strip('\n') for x in gameFile]	
+		
+		
+		
+	starting_date = datetime.datetime(2000,1,1)
+	for g in range(0, len(gameFile)):
+		if ('_d' in gameFile[g]):
+			date_on_line = str(gameFile[g+1])
+			try:
+				event_date = datetime.datetime.strptime(date_on_line, '%Y-%m-%d')
+				if (event_date >= starting_date):
+					starting_date = event_date
+			except ValueError:
+				print "Incorrect format"
+			
+			
+	return starting_date
 	
 
 
