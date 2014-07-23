@@ -3,6 +3,8 @@ import retriever
 import extractor
 import time
 import datetime
+import shelve
+
 
 
 HAMMERTEAM = 0
@@ -42,6 +44,7 @@ def getGames():
 		
 		
 def addGames(gameData):	
+
 	gameFile = open('games.dat', 'a')
 
 	
@@ -114,7 +117,48 @@ def getStartingDate():
 			
 	return starting_date
 	
-
+	
+def removeDuplicates():
+	f = open('games.dat', 'r')	
+	#Put files into an array
+	gameFile = f.readlines()
+	#Close file
+	f.close()
+	#strip each entry in the array of the \n
+	gameFile = [x.strip('\n') for x in gameFile]
+	
+	game_date = ''
+	game_linescore = ''
+	game_skip = ''
+	game_event = ''
+	
+	finished = False
+	started = False
+	
+	
+	for g in range(0, len(gameFile)):
+		if (finished == True):
+			for h in range(g+2, len(gameFile)):
+				if (gameFile[h+1] == game_date and \
+				gameFile[h+3] == game_linescore and \
+				gameFile[h+10] == game_skip and \
+				gameFile[h+25] ==  game_event):
+					
+					print("Duplicate Found on " + g)
+		elif ('_d' in gameFile[g]):
+			finished = False
+			started = True
+			game_date = gameFile[g+1]
+		elif ('_lh' in gameFile[g]):
+			game_linescore = gameFile[g+1]
+		elif ('_hs' in gameFile[g]):
+			game_skip = gameFile[g+1]
+		elif ('_e' in gameFile[g]):
+			finished = True
+			started = False
+			game_event = gameFile[g+1]
+		
+def gameIsADuplicate:
 
 	
 
