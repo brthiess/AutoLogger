@@ -86,9 +86,9 @@ def addGames(gameData):
 		
 		
 def updateGames():
-	getGames()
+	#getGames()
 	#TODO: Remove Duplicate games
-	#removeDuplicates()
+	removeDuplicates()
 	
 
 #Gets the latest date of the games in the games.dat file
@@ -138,13 +138,13 @@ def removeDuplicates():
 	
 	for g in range(0, len(gameFile)):
 		if (finished == True):
-			for h in range(g+2, len(gameFile)):
+			for h in range(g+2, len(gameFile)-25):
 				if (gameFile[h+1] == game_date and \
 				gameFile[h+3] == game_linescore and \
 				gameFile[h+10] == game_skip and \
-				gameFile[h+25] ==  game_event):
-					
-					print("Duplicate Found on " + g)
+				gameFile[h+25] ==  game_event):					
+					print("Duplicate Found on " + str(h))
+					finished = False
 		elif ('_d' in gameFile[g]):
 			finished = False
 			started = True
@@ -158,10 +158,8 @@ def removeDuplicates():
 			started = False
 			game_event = gameFile[g+1]
 		
-def gameIsADuplicate:
-
 	
 
-getGames()
+updateGames()
 		
 	
