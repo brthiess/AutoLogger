@@ -33,7 +33,7 @@ def getNextPage(html, web_url, starting_date):
 	#Go through the HTML line by line, check for relevant links
 	for line in html:
 		#Check for events first.  Check to make sure event is not older than the latest date (i.e. already in games.dat)
-		if (EVENT in line and EVENTLINK in line and eventIsNotOlderThanLatestDate(web_url, html, line, starting_date)):
+		if (EVENT in line and EVENTLINK in line and eventIsNotOlderThanLatestDate(web_url, html, line, starting_date) and eventHasBeenPlayed(web_url, html, line)):
 			#Grab the event URL
 			print("Navigator decided to visit this event")
 			url = line.split("<A HREF=")
@@ -107,6 +107,22 @@ def eventIsNotOlderThanLatestDate(web_url, html, line, starting_date):
 			else:
 				print("And decided not to visit it")
 				return False
+				
+def eventHasBeenPlayed(web_url, html, line):
+	todays_date = datetime.datetime.now()
+	for h in range(0, len(html)):
+		if (line in html[h]):
+			event_date = getDate(web_url, html[h+4])
+			print("Navigator found this date for an event: " + str(event_date))
+			#If the event happens after todays date 
+			#then return false
+			#else return true
+			if (event_date <= todays_date):
+				print("...And decided to visit it")
+				return True
+			else:
+				print("And decided not to visit it")
+				return False 
 	
 #Is given the line of html that contains the event date on the schedules page
 #and parses it out and returns it	

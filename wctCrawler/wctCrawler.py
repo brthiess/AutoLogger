@@ -22,7 +22,7 @@ def getGames():
 	#Get initial HTML from the starting URL address
 	html = retriever.getHTML(URL)
 
-		
+	#What the earliest date an event can be to have its information extracted
 	starting_date = getStartingDate()
 	
 	#Get URL for next page
@@ -86,7 +86,7 @@ def addGames(gameData):
 		
 		
 def updateGames():
-	#getGames()
+	getGames()
 	#TODO: Remove Duplicate games
 	removeDuplicates()
 	
@@ -121,11 +121,11 @@ def getStartingDate():
 def removeDuplicates():
 	f = open('games.dat', 'r')	
 	#Put files into an array
-	gameFile = f.readlines()
+	games_dat = f.readlines()
 	#Close file
 	f.close()
 	#strip each entry in the array of the \n
-	gameFile = [x.strip('\n') for x in gameFile]
+	games_dat = [x.strip('\n') for x in games_dat]
 	
 	game_date = ''
 	game_linescore = ''
@@ -135,28 +135,46 @@ def removeDuplicates():
 	finished = False
 	started = False
 	
+	duplicates = []
 	
-	for g in range(0, len(gameFile)):
+	#Find duplicates
+	for g in range(0, len(games_dat)):
 		if (finished == True):
-			for h in range(g+2, len(gameFile)-25):
-				if (gameFile[h+1] == game_date and \
-				gameFile[h+3] == game_linescore and \
-				gameFile[h+10] == game_skip and \
-				gameFile[h+25] ==  game_event):					
+			for h in xrange(g+2, len(games_dat)-25, 27 ):
+				if (games_dat[h+1] == game_date and \
+				games_dat[h+3] == game_linescore and \
+				games_dat[h+10] == game_skip and \
+				games_dat[h+25] ==  game_event):					
 					print("Duplicate Found on " + str(h))
-					finished = False
-		elif ('_d' in gameFile[g]):
+					duplicates.append(h)
+			finished = False
+		elif ('_d' in games_dat[g]):
 			finished = False
 			started = True
-			game_date = gameFile[g+1]
-		elif ('_lh' in gameFile[g]):
-			game_linescore = gameFile[g+1]
-		elif ('_hs' in gameFile[g]):
-			game_skip = gameFile[g+1]
-		elif ('_e' in gameFile[g]):
+			game_date = games_dat[g+1]
+		elif ('_lh' in games_dat[g]):
+			game_linescore = games_dat[g+1]
+		elif ('_hs' in games_dat[g]):
+			game_skip = games_dat[g+1]
+		elif ('_e' in games_dat[g]):
 			finished = True
 			started = False
-			game_event = gameFile[g+1]
+			game_event = games_dat[g+1]
+	
+	
+	#Create a duplicate file 		
+	f = open('games.dat', 'w')
+	
+	#Write in all of the games from the previous file 
+	#Without the duplicate games
+	for line in xrange(0, len(games_dat), 27):
+		if (line in duplicates):
+			line += 27
+			continue
+		
+		for l in range(line, line + 27):
+			f.write(games_dat[l] + '\n')
+	
 		
 	
 
